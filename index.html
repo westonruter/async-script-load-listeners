@@ -5,37 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="https://glitch.com/favicon.ico" />
 
-    <title>Async Script Load Listener</title>
+    <title>Listening for Loaded Async Scripts</title>
   </head>
   <body>
-    <h1>
-      Async Script Load Listener
-    </h1>
-    
+    <h1>Listening for Loaded Async Scripts</h1>
+
     <p>
-      This demonstrates a few ways that a blocking non-<code>async</code> script can listen for an <code>async</code> script to load.
+      This demonstrates a few ways that a blocking non-<code>async</code> script
+      can listen for an <code>async</code> script to load:
     </p>
-    
+    <ol>
+      <li>
+        An <code>onload</code> event handler attribute on the
+        <code>script[async]</code>
+      </li>
+      <li>
+        Adding a <code>load</code> event listener to the
+        <code>script[async]</code> which has a defined <code>id</code>
+      </li>
+      <li>
+        Listening for the <code>readystatechange</code> event until
+        <code>document.readyState === 'complete'</code>. The downside here is it
+        waits for <em>all</em> async scripts and other assets to have downloaded
+        (so similar to the <code>load</code> event on <code>window</code>).
+      </li>
+      <li>The <code>load</code> event on the window.</li>
+    </ol>
+
     <pre id="output"></pre>
-    
-    <script src="/script.js" async id="async-script" onload="myAsyncFunc('script onload attribute')"></script>
-    <script>
-      document.getElementById( 'output' ).textContent += 'Inline blocking script evaluated\n';
-      
-      document.getElementById( 'async-script' ).addEventListener('load', () => {
-        document.getElementById( 'output' ).textContent += 'Async script load event triggered\n';
-        myAsyncFunc( 'script load event handler' );
-      });
-      
-      document.addEventListener( 'readystatechange', ( event ) => {
-        document.getElementById( 'output' ).textContent += `Ready state change: ${document.readyState}\n`;
-        if ( document.readyState === 'complete' ) {
-          myAsyncFunc( 'readystatechange event handler' );
-        }
-      } );
+
+    <script id="async-js-before">
+    window.myAsyncLib = window.myAsyncLib || [];
+    window.myAsyncLib.push(() => {
+      myAsyncFunc("async library event system");
+    });
     </script>
-    
-    <hr>
+    <script
+      src="/script.js"
+      async
+      id="async-js"
+      onload="/*OPTION 1*/ myAsyncFunc('script onload attribute')"
+    ></script>
+    <script id="async-js-after">
+      document.getElementById("output").textContent +=
+        "Inline blocking script evaluated\n";
+
+      // TODO: Confirm that the async script will NEVER be fully loaded before this script is executed.
+      document.getElementById("async-js").addEventListener("load", () => {
+        /*OPTION 2*/
+        document.getElementById("output").textContent +=
+          "Async script load event triggered\n";
+        myAsyncFunc("script load event handler");
+      });
+
+      document.addEventListener("readystatechange", (event) => {
+        document.getElementById(
+          "output"
+        ).textContent += `Ready state change: ${document.readyState}\n`;
+        if (document.readyState === "complete") {
+          /*OPTION 3*/
+          myAsyncFunc("readystatechange event handler");
+        }
+      });
+
+      window.addEventListener("load", () => {
+        /*OPTION 4*/
+        myAsyncFunc("window load event handler");
+      });
+
+      const interval = setInterval(() => {
+        if (myAsyncFunc) {
+          clearInterval(interval);
+          myAsyncFunc("setInterval polling");
+        }
+      }, 10);
+    </script>
+
+    <hr />
     <address>
       <a href="https://weston.ruter.net/">@westonruter</a>
     </address>
