@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="https://glitch.com/favicon.ico" />
 
-    <title>Listening for Loaded Async Scripts</title>
+    <title>Listening for Loaded Async Script</title>
   </head>
   <body>
-    <h1>Listening for Loaded Async Scripts</h1>
+    <h1>Listening for Loaded Async Script</h1>
 
     <p>
       This demonstrates a few ways that a blocking non-<code>async</code> script
@@ -16,12 +16,19 @@
     </p>
     <ol>
       <li>
+        Using the an event system provided by the async library itself, e.g. <code>(window.myLib = window.myLib || []).push(callback)</code>
+      </li>
+      <li>
         An <code>onload</code> event handler attribute on the
-        <code>script[async]</code>.
+        <code>script[async]</code>. Not ideal since it requires
+        <code>'unsafe-hashes'</code> for CSP.
       </li>
       <li>
         Adding a <code>load</code> event listener to the
-        <code>script[async]</code> which has a defined <code>id</code>.
+        <code>script[async]</code> which has a defined <code>id</code>. Ideal,
+        as long as we can be sure that the <code>script[async]</code> will not
+        finish loading <code>before</code> the subsequent inline blocking script
+        with <code>script.addEventListener('load', ...)</code> can run.
       </li>
       <li>
         Listening for the <code>readystatechange</code> event until
@@ -35,24 +42,24 @@
       </li>
       <li>Polling with <code>setInterval</code> (the worst).</li>
     </ol>
-    
-    <hr>
+
+    <hr />
 
     <pre id="output"></pre>
 
     <script id="async-js-before">
       document.getElementById("output").textContent +=
         "Inline blocking before script evaluated\n";
-      window.myAsyncLib = window.myAsyncLib || [];
-      window.myAsyncLib.push((lib) => {
-        lib.log("async library event system");
+      
+      (window.myAsyncLib = window.myAsyncLib || []).push((lib) => {
+        lib.log("async library event system (option 1)");
       });
     </script>
     <script
       src="/script.js"
       async
       id="async-js"
-      onload="/*OPTION 1*/ window.myAsyncLib.push((lib) => {lib.log('script onload attribute')})"
+      onload="document.getElementById('output').textContent += 'Async script load event (via onload attribute)\n'; window.myAsyncLib.push((lib) => {lib.log('script onload attribue (option 2)')})"
     ></script>
     <script id="async-js-after">
       document.getElementById("output").textContent +=
@@ -60,11 +67,10 @@
 
       // TODO: Confirm that the async script will NEVER be fully loaded before this script is executed.
       document.getElementById("async-js").addEventListener("load", () => {
-        /*OPTION 2*/
         document.getElementById("output").textContent +=
-          "Async script load event triggered\n";
+          "Async script load event (from addEventListener)\n";
         window.myAsyncLib.push((lib) => {
-          lib.log("script load event handler");
+          lib.log("script load event via addEventListener (option 3)");
         });
       });
 
@@ -73,17 +79,15 @@
           "output"
         ).textContent += `Ready state change: ${document.readyState}\n`;
         if (document.readyState === "complete") {
-          /*OPTION 3*/
           window.myAsyncLib.push((lib) => {
-            lib.log("readystatechange event handler");
+            lib.log("readystatechange event handler (option 4)");
           });
         }
       });
 
       window.addEventListener("load", () => {
-        /*OPTION 4*/
         window.myAsyncLib.push((lib) => {
-          lib.log("window load event handler");
+          lib.log("window load event handler (option 5)");
         });
       });
 
@@ -91,7 +95,7 @@
         if (window.myAsyncLib) {
           clearInterval(interval);
           window.myAsyncLib.push((lib) => {
-            lib.log("setInterval polling");
+            lib.log("setInterval polling (option 6)");
           });
         }
       }, 10);
