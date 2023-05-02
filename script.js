@@ -1,4 +1,5 @@
-/* If you're feeling fancy you can add interactivity 
-    to your site with Javascript */
+document.getElementById( 'output' ).textContent += 'Async script evaluated\n';
 
-console.log("Hello, world!");
+window.myAsyncFunc = function ( source ) {
+  document.getElementById( 'output' ).textContent += `Async script\'s function called by ${source}\n`;
+}

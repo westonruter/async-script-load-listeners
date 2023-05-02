@@ -5,26 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="https://glitch.com/favicon.ico" />
 
-    <title>Hello world!</title>
-
-    <!-- import the webpage's stylesheet -->
-    <link rel="stylesheet" href="/style.css" />
-
-    <!-- import the webpage's javascript file -->
-    <script src="/script.js" defer></script>
+    <title>Async Script Load Listener</title>
   </head>
   <body>
-    <!-- this is the start of content -->
     <h1>
-      Hello World!
+      Async Script Load Listener
     </h1>
+    
     <p>
-      This starter gives you everything you need to start working on a new
-      website, and nothing more. If you're looking for something a little more
-      opinionated, try remixing
-      <a href="https://glitch.com/edit/#!/remix/glitch-hello-website"
-        >~glitch-hello-website</a
-      >.
+      This demonstrates a few ways that a blocking non-<code>async</code> script can listen for an <code>async</code> script to load.
     </p>
+    
+    <pre id="output"></pre>
+    
+    <script src="/script.js" async id="async-script" onload="myAsyncFunc('script onload attribute')"></script>
+    <script>
+      document.getElementById( 'output' ).textContent += 'Inline blocking script evaluated\n';
+      
+      document.getElementById( 'async-script' ).addEventListener('load', () => {
+        document.getElementById( 'output' ).textContent += 'Async script load event triggered\n';
+        myAsyncFunc( 'script load event handler' );
+      });
+      
+      document.addEventListener( 'readystatechange', ( event ) => {
+        document.getElementById( 'output' ).textContent += `Ready state change: ${document.readyState}\n`;
+        if ( document.readyState === 'complete' ) {
+          myAsyncFunc( 'readystatechange event handler' );
+        }
+      } );
+    </script>
+    
+    <hr>
+    <address>
+      <a href="https://weston.ruter.net/">@westonruter</a>
+    </address>
   </body>
 </html>
