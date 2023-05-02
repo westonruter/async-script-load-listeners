@@ -1,11 +1,11 @@
-document.getElementById("output").textContent += "Async script evaluated\n";
+document.getElementById("output").textContent += "🔵 Async script evaluated\n";
 
 const myAsyncLib = window.myAsyncLib = window.myAsyncLib || [];
 
 myAsyncLib.log = (source) => {
   document.getElementById(
     "output"
-  ).textContent += `Async script\'s function called by ${source}\n`;
+  ).textContent += `✅ Async script\'s function called by ${source}\n`;
 }
 
 for (const callback of window.myAsyncLib) {

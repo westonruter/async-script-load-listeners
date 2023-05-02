@@ -6,6 +6,11 @@
     <link rel="icon" href="https://glitch.com/favicon.ico" />
 
     <title>Listening for Loaded Async Script</title>
+    <style>
+      li {
+        margin-bottom: 0.5em;
+      }
+    </style>
   </head>
   <body>
     <h1>Listening for Loaded Async Script</h1>
@@ -16,7 +21,8 @@
     </p>
     <ol>
       <li>
-        Using the an event system provided by the async library itself, e.g. <code>(window.myLib = window.myLib || []).push(callback)</code>
+        Using the an event system provided by the async library itself, e.g.
+        <code>(window.myLib = window.myLib || []).push(callback)</code>
       </li>
       <li>
         An <code>onload</code> event handler attribute on the
@@ -40,8 +46,12 @@
         The <code>load</code> event on the window. (Worse than
         <code>readystatechange</code>.)
       </li>
-      <li>Polling with <code>setInterval</code> (the worst).</li>
+      <li>Polling with <code>setInterval</code>. (The worst).</li>
     </ol>
+    
+    <p>
+      Did I miss anything?
+    </p>
 
     <hr />
 
@@ -49,8 +59,8 @@
 
     <script id="async-js-before">
       document.getElementById("output").textContent +=
-        "Inline blocking before script evaluated\n";
-      
+        "🔵 Inline blocking before script evaluated\n";
+
       (window.myAsyncLib = window.myAsyncLib || []).push((lib) => {
         lib.log("async library event system (option 1)");
       });
@@ -59,16 +69,16 @@
       src="/script.js"
       async
       id="async-js"
-      onload="document.getElementById('output').textContent += 'Async script load event (via onload attribute)\n'; window.myAsyncLib.push((lib) => {lib.log('script onload attribue (option 2)')})"
+      onload="document.getElementById('output').textContent += '🔵 Async script load event (via onload attribute)\n'; window.myAsyncLib.push((lib) => {lib.log('script onload attribue (option 2)')})"
     ></script>
     <script id="async-js-after">
       document.getElementById("output").textContent +=
-        "Inline blocking after script evaluated\n";
+        "🔵 Inline blocking after script evaluated\n";
 
       // TODO: Confirm that the async script will NEVER be fully loaded before this script is executed.
       document.getElementById("async-js").addEventListener("load", () => {
         document.getElementById("output").textContent +=
-          "Async script load event (from addEventListener)\n";
+          "🔵 Async script load event (from addEventListener)\n";
         window.myAsyncLib.push((lib) => {
           lib.log("script load event via addEventListener (option 3)");
         });
@@ -77,7 +87,7 @@
       document.addEventListener("readystatechange", (event) => {
         document.getElementById(
           "output"
-        ).textContent += `Ready state change: ${document.readyState}\n`;
+        ).textContent += `🔵 Ready state change: ${document.readyState}\n`;
         if (document.readyState === "complete") {
           window.myAsyncLib.push((lib) => {
             lib.log("readystatechange event handler (option 4)");
