@@ -17,11 +17,11 @@
     <ol>
       <li>
         An <code>onload</code> event handler attribute on the
-        <code>script[async]</code>
+        <code>script[async]</code>.
       </li>
       <li>
         Adding a <code>load</code> event listener to the
-        <code>script[async]</code> which has a defined <code>id</code>
+        <code>script[async]</code> which has a defined <code>id</code>.
       </li>
       <li>
         Listening for the <code>readystatechange</code> event until
@@ -29,33 +29,43 @@
         waits for <em>all</em> async scripts and other assets to have downloaded
         (so similar to the <code>load</code> event on <code>window</code>).
       </li>
-      <li>The <code>load</code> event on the window.</li>
+      <li>
+        The <code>load</code> event on the window. (Worse than
+        <code>readystatechange</code>.)
+      </li>
+      <li>Polling with <code>setInterval</code> (the worst).</li>
     </ol>
+    
+    <hr>
 
     <pre id="output"></pre>
 
     <script id="async-js-before">
-    window.myAsyncLib = window.myAsyncLib || [];
-    window.myAsyncLib.push(() => {
-      myAsyncFunc("async library event system");
-    });
+      document.getElementById("output").textContent +=
+        "Inline blocking before script evaluated\n";
+      window.myAsyncLib = window.myAsyncLib || [];
+      window.myAsyncLib.push((lib) => {
+        lib.log("async library event system");
+      });
     </script>
     <script
       src="/script.js"
       async
       id="async-js"
-      onload="/*OPTION 1*/ myAsyncFunc('script onload attribute')"
+      onload="/*OPTION 1*/ window.myAsyncLib.push((lib) => {lib.log('script onload attribute')})"
     ></script>
     <script id="async-js-after">
       document.getElementById("output").textContent +=
-        "Inline blocking script evaluated\n";
+        "Inline blocking after script evaluated\n";
 
       // TODO: Confirm that the async script will NEVER be fully loaded before this script is executed.
       document.getElementById("async-js").addEventListener("load", () => {
         /*OPTION 2*/
         document.getElementById("output").textContent +=
           "Async script load event triggered\n";
-        myAsyncFunc("script load event handler");
+        window.myAsyncLib.push((lib) => {
+          lib.log("script load event handler");
+        });
       });
 
       document.addEventListener("readystatechange", (event) => {
@@ -64,19 +74,25 @@
         ).textContent += `Ready state change: ${document.readyState}\n`;
         if (document.readyState === "complete") {
           /*OPTION 3*/
-          myAsyncFunc("readystatechange event handler");
+          window.myAsyncLib.push((lib) => {
+            lib.log("readystatechange event handler");
+          });
         }
       });
 
       window.addEventListener("load", () => {
         /*OPTION 4*/
-        myAsyncFunc("window load event handler");
+        window.myAsyncLib.push((lib) => {
+          lib.log("window load event handler");
+        });
       });
 
       const interval = setInterval(() => {
-        if (myAsyncFunc) {
+        if (window.myAsyncLib) {
           clearInterval(interval);
-          myAsyncFunc("setInterval polling");
+          window.myAsyncLib.push((lib) => {
+            lib.log("setInterval polling");
+          });
         }
       }, 10);
     </script>
