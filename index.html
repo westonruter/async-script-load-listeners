@@ -22,7 +22,7 @@
     <ol>
       <li>
         Using the an event system provided by the async library itself, e.g.
-        <code>(window.myLib = window.myLib || []).push(callback)</code>
+        <code>(window.myLib = window.myLib || []).push(callback)</code>.
       </li>
       <li>
         An <code>onload</code> event handler attribute on the
@@ -30,11 +30,24 @@
         <code>'unsafe-hashes'</code> for CSP.
       </li>
       <li>
-        Adding a <code>load</code> event listener to the
-        <code>script[async]</code> which has a defined <code>id</code>. Ideal,
-        as long as we can be sure that the <code>script[async]</code> will not
-        finish loading <code>before</code> the subsequent inline blocking script
-        with <code>script.addEventListener('load', ...)</code> can run.
+        <del
+          >Adding a <code>load</code> event listener to the
+          <code>script[async]</code> which has a defined <code>id</code>. Ideal,
+          as long as we can be sure that the <code>script[async]</code> will not
+          finish loading <code>before</code> the subsequent inline blocking
+          script with <code>script.addEventListener('load', ...)</code> can
+          run.</del
+        >
+        <ins
+          ><strong
+            >This is not reliable since the async script could load before the
+            inline script is executed. See
+            <a
+              href="https://async-script-load-event-listener-test.glitch.me/?delay=500"
+              >demonstration</a
+            >.</strong
+          ></ins
+        >
       </li>
       <li>
         Listening for the <code>readystatechange</code> event until
@@ -47,11 +60,16 @@
         <code>readystatechange</code>.)
       </li>
       <li>Polling with <code>setInterval</code>. (The worst).</li>
+      <li>
+        Using <code>MutationObserver</code> to listen for appearance of
+        subsquent appearance of the <code>script[async]</code> and adding the
+        <code>load</code> event via <code>addEventListener</code>. This feels
+        like it may not be reliable. Since <code>MutationObserver</code> is async
+        
+      </li>
     </ol>
-    
-    <p>
-      Did I miss anything?
-    </p>
+
+    <p>Did I miss anything?</p>
 
     <hr />
 
@@ -64,6 +82,18 @@
       (window.myAsyncLib = window.myAsyncLib || []).push((lib) => {
         lib.log("async library event system (option 1)");
       });
+
+      new MutationObserver((records, observer) => {
+        const script = document.getElementById("async-js");
+        if (script) {
+          observer.disconnect();
+          script.addEventListener("load", () => {
+            window.myAsyncLib.push((lib) => {
+              lib.log("script load event via MutationObserver (option 7)");
+            });
+          });
+        }
+      }).observe(document.body, { childList: true });
     </script>
     <script
       src="/script.js"
