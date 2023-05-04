@@ -64,8 +64,11 @@
         Using <code>MutationObserver</code> to listen for appearance of
         subsquent appearance of the <code>script[async]</code> and adding the
         <code>load</code> event via <code>addEventListener</code>. This feels
-        like it may not be reliable. Since <code>MutationObserver</code> is async
-        
+        like it may not be reliable. Since <code>MutationObserver</code> is
+        async it would seem like there could be a possibility that the
+        <code>script[async]</code> could be loaded before the
+        <code>MutationObserver</code> is triggered. This also feels it could be
+        a bit inefficient.
       </li>
     </ol>
 
@@ -105,12 +108,12 @@
       document.getElementById("output").textContent +=
         "🔵 Inline blocking after script evaluated\n";
 
-      // TODO: Confirm that the async script will NEVER be fully loaded before this script is executed.
+      // This option is not reliable!
       document.getElementById("async-js").addEventListener("load", () => {
         document.getElementById("output").textContent +=
           "🔵 Async script load event (from addEventListener)\n";
         window.myAsyncLib.push((lib) => {
-          lib.log("script load event via addEventListener (option 3)");
+          lib.log("script load event via addEventListener (WARNING: not reliable, option 3)");
         });
       });
 
