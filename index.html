@@ -81,7 +81,10 @@
         lib.log("async library event system (option 1)");
       });
 
+      /*
+       */
       new MutationObserver((records, observer) => {
+        console.log(records)
         const script = document.getElementById("async-js");
         if (script) {
           observer.disconnect();
