@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="https://glitch.com/favicon.ico" />
+
+    <title>Listen for load event on blocking script via MutationObserver</title>
+    <style>
+      li {
+        margin-bottom: 0.5em;
+      }
+    </style>
+    
+  </head>
+  <body>
+    <h1>Listen for <code>load</code> event on blocking script via <code>MutationObserver</code></h1>
+
+    <p>
+      This shows that even for non-async blocking scripts, the <code>MutationObserver</code> is able to 
+      attach the <code>load</code> event listener before the script is evaluated.
+    </p>
+    
+    <pre id="output"></pre>
+
+    <script id="sync-js-before">
+      /*
+       * Note: The observer callback will fire twice, once for when the whitespace text node
+       * is parsed, and then again when the script element is parsed. The callback ceases to
+       * continue being called because it is disconnected as soon as the script detected.
+       */
+      let mutationObservations = 0;
+      new MutationObserver((records, observer) => {
+        mutationObservations++;
+        const script = document.getElementById("sync-js");
+        if (script) {
+          observer.disconnect();
+          script.addEventListener("load", () => {
+            window.myAsyncLib.push((lib) => {
+              lib.log("addEventListener via MutationObserver");
+            });
+          });
+        }
+      }).observe(document.currentScript.parentNode, { childList: true });
+    </script>
+    <script
+      src="/script.js"
+      id="sync-js"
+    ></script>
+
+    <hr />
+    <address>
+      <a href="https://weston.ruter.net/">@westonruter</a>
+    </address>
+  </body>
+</html>
