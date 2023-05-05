@@ -61,14 +61,9 @@
       </li>
       <li>Polling with <code>setInterval</code>. (The worst).</li>
       <li>
-        Using <code>MutationObserver</code> to listen for appearance of
-        subsquent appearance of the <code>script[async]</code> and adding the
-        <code>load</code> event via <code>addEventListener</code>. This feels
-        like it may not be reliable. Since <code>MutationObserver</code> is
-        async it would seem like there could be a possibility that the
-        <code>script[async]</code> could be loaded before the
-        <code>MutationObserver</code> is triggered. This also feels it could be
-        a bit inefficient.
+        Using <code>MutationObserver</code> to listen for subsquent parsing of
+        the <code>script[async]</code> and adding the <code>load</code> event
+        via <code>addEventListener</code>. (Ugly? Inefficient?)
       </li>
     </ol>
 
@@ -96,7 +91,7 @@
             });
           });
         }
-      }).observe(document.body, { childList: true });
+      }).observe(document.currentScript.parentNode, { childList: true });
     </script>
     <script
       src="/script.js"
@@ -113,7 +108,9 @@
         document.getElementById("output").textContent +=
           "🔵 Async script load event (from addEventListener)\n";
         window.myAsyncLib.push((lib) => {
-          lib.log("script load event via addEventListener (WARNING: not reliable, option 3)");
+          lib.log(
+            "script load event via addEventListener (WARNING: not reliable, option 3)"
+          );
         });
       });
 
