@@ -11,6 +11,7 @@
         margin-bottom: 0.5em;
       }
     </style>
+    
   </head>
   <body>
     <h1>Listening for Loaded Async Script</h1>
@@ -63,7 +64,11 @@
       <li>
         Using <code>MutationObserver</code> to listen for subsquent parsing of
         the <code>script[async]</code> and adding the <code>load</code> event
-        via <code>addEventListener</code>. (Props to <a href="https://www.linkedin.com/in/noamrosenthal/" target="_blank">Noam Rosenthal</a> for this approach.)
+        via <code>addEventListener</code>. (Props to
+        <a href="https://www.linkedin.com/in/noamrosenthal/" target="_blank"
+          >Noam Rosenthal</a
+        >
+        for this approach.)
       </li>
     </ol>
 
@@ -82,15 +87,20 @@
       });
 
       /*
+       * Note: The observer callback will fire twice, once for when the whitespace text node
+       * is parsed, and then again when the script element is parsed. The callback ceases to
+       * continue being called because it is disconnected as soon as the script detected.
        */
+      let mutationObservations = 0;
       new MutationObserver((records, observer) => {
         console.log(records)
+        mutationObservations++;
         const script = document.getElementById("async-js");
         if (script) {
           observer.disconnect();
           script.addEventListener("load", () => {
             window.myAsyncLib.push((lib) => {
-              lib.log("script load event via MutationObserver (option 7)");
+              lib.log(`script load event via MutationObserver after ${mutationObservations} mutation callback(s) (option 7)`);
             });
           });
         }
