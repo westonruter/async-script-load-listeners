@@ -18,18 +18,15 @@
         };
         const options = { capture: true }; // aka useCapture
 
-        document.documentElement.addEventListener(
-          "load",
-          onScriptLoad,
-          options
-        );
+        // Add capturing load event listener on the Document to detect load events for all elements.
+        document.addEventListener("load", onScriptLoad, options);
 
-        // Remove the above listener once the page has loaded, since no longer needed 
+        // Remove the above listener once the page has loaded, since no longer needed
         // (unless you are going to be adding more async scripts dynamically).
         window.addEventListener(
           "load",
           () => {
-            //document.documentElement.removeEventListener("load", onScriptLoad, options);
+            document.removeEventListener("load", onScriptLoad, options);
           },
           { once: true }
         );
@@ -114,7 +111,7 @@
         <a
           href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#:~:text=with%20the%20listener.-,useCapture,-Optional"
           ><code>useCapture</code></a
-        >) set to <code>true</code>.
+        >) set to <code>true</code>. The best?
       </li>
     </ol>
 
