@@ -6,16 +6,23 @@
     <link rel="icon" href="https://glitch.com/favicon.ico" />
 
     <script>
-    document.documentElement.addEventListener(
-      'load',
-      ( event ) => {
-        console.log( event );
-      },
-      { capture: true }
-    );
+      (() => {
+        const onload = (event) => {
+            if (event.target instanceof HTMLScriptElement && event.target.async) {
+              window.myAsyncLib.push((lib) => {
+                lib.log("capturing load event handler on documentElement (option 8)");
+              });
+            }
+          }
+        
+        document.documentElement.addEventListener(
+          "load",
+          ,
+          { capture: true } // aka useCapture
+        );
+      })();
     </script>
-    
-    
+
     <title>Listening for Loaded Async Script</title>
     <style>
       li {
@@ -84,7 +91,17 @@
         for this approach.)
       </li>
       <li>
-        Adding a <code>load</code> event listener on the <code>document.documentElement</code> with the <code>capture</code> option (<code>useCapture</code>) set to <code>true</code>.
+        Adding a <code>load</code> event listener on the
+        <code>document.documentElement</code> with the
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#:~:text=available%20options%20are%3A-,capture,-Optional"
+          ><code>capture</code></a
+        >
+        option (aka
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#:~:text=with%20the%20listener.-,useCapture,-Optional"
+          ><code>useCapture</code></a
+        >) set to <code>true</code>.
       </li>
     </ol>
 
