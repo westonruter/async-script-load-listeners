@@ -7,18 +7,31 @@
 
     <script>
       (() => {
-        const onload = (event) => {
-            if (event.target instanceof HTMLScriptElement && event.target.async) {
-              window.myAsyncLib.push((lib) => {
-                lib.log("capturing load event handler on documentElement (option 8)");
-              });
-            }
+        const onScriptLoad = (event) => {
+          if (event.target instanceof HTMLScriptElement && event.target.async) {
+            window.myAsyncLib.push((lib) => {
+              lib.log(
+                "capturing load event handler on documentElement (option 8)"
+              );
+            });
           }
-        
+        };
+        const options = { capture: true }; // aka useCapture
+
         document.documentElement.addEventListener(
           "load",
-          ,
-          { capture: true } // aka useCapture
+          onScriptLoad,
+          options
+        );
+
+        // Remove the above listener once the page has loaded, since no longer needed 
+        // (unless you are going to be adding more async scripts dynamically).
+        window.addEventListener(
+          "load",
+          () => {
+            //document.documentElement.removeEventListener("load", onScriptLoad, options);
+          },
+          { once: true }
         );
       })();
     </script>
