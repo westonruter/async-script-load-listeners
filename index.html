@@ -8,7 +8,11 @@
     <script>
       (() => {
         const onScriptLoad = (event) => {
-          if (event.target instanceof HTMLScriptElement && event.target.async) {
+          if (
+            event.target instanceof HTMLScriptElement &&
+            event.target.async &&
+            event.target.id === "async-js"
+          ) {
             window.myAsyncLib.push((lib) => {
               lib.log(
                 "capturing load event handler on documentElement (option 8)"
