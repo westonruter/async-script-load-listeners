@@ -141,7 +141,7 @@ Another benefit of this is we no longer pollute the global namespace with `wpLoa
 Replying to [azaozz](https://core.trac.wordpress.org/ticket/12009#comment:97):
 > I still don't see why (and how) async scripts can be handled through script-loader. As I said earlier, they cannot be used as a dependency and cannot be dependent on other scripts because of the unknown execution order.
 
-In this case, the scripts themselves handle the proper execution order. This is elaborated on in [my PR comment](https://github.com/WordPress/wordpress-develop/pull/4391/files#r1179857620) and you can see an example for how an async library can handle the proper loading order in this glitch: https://async-library-script-loading-demo.glitch.me/
+In this case, the scripts themselves handle the proper execution order. This is elaborated on in [my PR comment](https://github.com/WordPress/wordpress-develop/pull/4391/files#r1179857620) and you can see an example for how an async library can handle the proper loading order in this glitch: https://westonruter.github.io/async-library-script-loading-demo/
 
 In short, for async scripts, the dependencies are not so much about the execution order but more about a bundling mechanism. If you have an `async` script C that depends on B, and `async` script B depends on `async` script A, then doing `wp_enqueue_script('C')` should automatically also print the scripts for `A` and `B`.
 
