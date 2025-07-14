@@ -1,3 +1,5 @@
+# Listening for Loaded Async Script
+
 This repo contains the research for I was doing for WordPress core to enable inline `after` scripts to delay their execution until after the related script is loaded. This is for the following Trac ticket:
 
 * [#12009](https://core.trac.wordpress.org/ticket/12009): Add support for HTML 5 "async" and "defer" attributes in WordPress core.
@@ -6,11 +8,11 @@ Specifically, the research I was doing in order to make the approach compatible 
 
 This repo contains that original research as well as citing some of my key relevant comments which are otherwise buried among hundreds of others.
 
-# [Pull Request Comment](https://github.com/WordPress/wordpress-develop/pull/4391#issuecomment-1536869109)
+## [Pull Request Comment](https://github.com/WordPress/wordpress-develop/pull/4391#issuecomment-1536869109)
 
 I've been doing a bunch of research this week on [`wpLoadAfterScripts()`](https://github.com/WordPress/wordpress-develop/blob/425a905a46406b93d061fccdd3ac8b0b890e9eae/src/wp-includes/script-loader.php#L1859-L1869), specifically how it relates to `Content-Security-Policy` (CSP). Here are my findings and recommendations.
 
-## Vulnerability with Strict CSP and Deferred Inline Script Nonces
+### Vulnerability with Strict CSP and Deferred Inline Script Nonces
 
 Previously, this function relied on `eval()` which I was concerned about in relation to CSP because it requires the [`'unsafe-eval'`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src#unsafe_eval_expressions) source expression. So that was [replaced](https://github.com/WordPress/wordpress-develop/commit/0e120b745b17d094244c004d9a11156379ce1971) with the current approach of cloning the `script`, setting the `type` to `text/javascript`, and replacing the original. See [prior discussion](https://github.com/10up/wordpress-develop/pull/54#pullrequestreview-1403010042). While this successfully eliminates `eval()` and the need for `'unsafe-eval'` it actually introduces a separate CSP security problem which is quite subtle.
 
@@ -60,7 +62,7 @@ How to resolve this? We'll need to manually make sure that the `nonce` value on 
 
 I made a playground where this issue can be experimented with: https://wp-scripts-csp-test.glitch.me/
 
-## Strict CSP Blocked by `unsafe-hashes` Requirement
+### Strict CSP Blocked by `unsafe-hashes` Requirement
 
 In Core-32067/Core-39941, the goal was to eliminate all event handler attributes so that CSP could be enabled without the [`'unsafe-hashes'`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src#unsafe_hashes) source expression, again which Google has recommended in [Strict CSP](https://csp.withgoogle.com/docs/strict-csp.html). Nevertheless, the current implementation relies on `onload` event handler attributes on `async` and `defer` scripts in order to determine when they have been evaluated. If you have three deferred scripts on your page with handles `foo`, `bar`, `baz`, you'd need to send the following hashes with each response along with the `'unsafe-hashes'` source expression:
 
