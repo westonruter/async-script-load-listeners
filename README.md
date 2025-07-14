@@ -6,7 +6,9 @@ This repo contains the research for I was doing for WordPress core to enable inl
 
 Specifically, the research I was doing in order to make the approach compatible with CSP. Ultimately, "[Script Loading Strategies](https://make.wordpress.org/core/2023/07/14/registering-scripts-with-async-and-defer-attributes-in-wordpress-6-3/)" landed without support for allowing `async`/`defer` scripts to have inline `after` scripts. When such inline scripts are present, the `async`/`defer` falls back to blocking. Trac ticket [#58632](https://core.trac.wordpress.org/ticket/58632) (Add support for 'async' and 'defer' loading to script that use inline scripts) was opened to continue considering this, but it was closed as `maybelater` given there [not being enough inline `after` scripts](https://core.trac.wordpress.org/ticket/58632#comment:3) for `async`/`defer` scripts to warrany the additional complexity for now.
 
-This repo contains that original research as well as citing some of my key relevant comments which are otherwise buried among hundreds of others.
+This repo contains that original research as well as citing some of my key relevant comments which are otherwise buried among hundreds of others. 
+
+_(I haven't migrated all of the Glitches over to GitHub, but ping me if you want to see anything as I have them backed up.)_
 
 ## [Pull Request Comment](https://github.com/WordPress/wordpress-develop/pull/4391#issuecomment-1536869109)
 
