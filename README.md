@@ -126,6 +126,16 @@ Since `MutationObserver` callbacks are run in microtasks when the parser encount
 
 This would then allow for the Strict CSP to be applied without adding `'unsafe-hashes'`.
 
+# PR: [Use `addEventListener` to catch script load events instead of `onload` event handler attribute](https://github.com/10up/wordpress-develop/pull/62)
+
+Extends https://github.com/WordPress/wordpress-develop/pull/4391
+
+This fixes the need to use the `'unsafe-hashes'` CSP source expression as [explained in the other PR](https://github.com/WordPress/wordpress-develop/pull/4391#issuecomment-1536869109:~:text=Strict%20CSP%20Blocked%20by%20unsafe%2Dhashes%20Requirement). 
+
+Instead of attaching a `load` event listener to every `script` on the page, it instead adds a single _capturing_ `load` event listener on the `document`. The benefit here is it will reliably catch the loading of `async` scripts, versus other alternatives seen in: https://westonruter.github.io/async-script-load-listeners/
+
+Another benefit of this is we no longer pollute the global namespace with `wpLoadAfterScripts`.
+
 # [Trac Comment](https://core.trac.wordpress.org/ticket/12009#comment:100)
 
 Replying to [azaozz](https://core.trac.wordpress.org/ticket/12009#comment:97):
