@@ -103,7 +103,7 @@ document.getElementById("foo-js").addEventListener("load", function () {
 
 If you try this, it does seem to work. However, it is not entirely reliable. If there is a network delay when loading the HTML, and the parser pauses after the first `script` is printed, it may load and evaluate `foo.js` before the second script is parsed and evaluated. This would mean that the `load` event would have already fired, and the `addEventListener` call would be too late. I made a demo that shows how this can be consistently reproduced: https://async-script-load-event-listener-test.glitch.me/
 
-I experimented with several ways of listening for the `load` event on deferred scripts: https://async-script-load-listeners.glitch.me/
+I experimented with several ways of listening for the `load` event on deferred scripts: https://westonruter.github.io/async-script-load-listeners/
 
 What I think turns out to be the most robust is to leverage `MutationObserver`. For example, instead of the above code, the following can be employed:
 
